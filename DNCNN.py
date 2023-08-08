@@ -71,6 +71,7 @@ optimizer = optim.Adam(dncnn.parameters(), lr=0.0002, betas=(0.5, 0.999))
 num_epochs = 10
 
 for epoch in range(num_epochs):
+    print(f"Epoch {epoch+1}/{num_epochs}")
     for i, (images, labels) in enumerate(dataloader):
         real_images = images.to(device)
         labels = labels.to(device)
@@ -82,11 +83,15 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
+        if (i+1) % 10 == 0:
+            print(f"Batch [{i+1}/{len(dataloader)}], Loss: {loss.item()}")
+
 def denoise_image(image):
     with torch.no_grad():
         image = image.unsqueeze(0).to(device)
         output = dncnn(image)
     return output.squeeze(0).cpu()
+
 test_image = Image.open('1.png').convert('RGB')
 test_image = transform(test_image)
 denoised_image = denoise_image(test_image)
@@ -102,3 +107,5 @@ plt.axis('off')
 plt.subplot(1, 2, 2)
 plt.imshow(denoised_image.permute(1, 2, 0))
 plt.title('Denoised Image')
+
+plt.show()
